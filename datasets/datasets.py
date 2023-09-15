@@ -10,7 +10,7 @@ from utils.utils import set_random_seed
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
 
-
+FashionMNIST_SUPERCLASS = list(range(10))  # one class
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 IMAGENET_SUPERCLASS = list(range(30))  # one class
 
@@ -122,7 +122,7 @@ def get_transform_imagenet():
     return train_transform, test_transform
 
 
-def get_dataset(P, dataset, test_only=False, image_size=None, download=True, eval=False):
+def get_dataset(P, dataset, test_only=False, image_size=None, download=False, eval=False):
     if dataset in ['imagenet', 'cub', 'stanford_dogs', 'flowers102',
                    'places365', 'food_101', 'caltech_256', 'dtd', 'pets']:
         if eval:
@@ -138,6 +138,12 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=True, eva
         n_classes = 10
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
+
+    elif dataset == 'fmnist':
+        image_size = (28, 28, 3)
+        n_classes = 10
+        train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
 
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
@@ -237,6 +243,8 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=True, eva
 def get_superclass_list(dataset):
     if dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
+    elif dataset == 'fmnist':
+        return FashionMNIST_SUPERCLASS    
     elif dataset == 'cifar100':
         return CIFAR100_SUPERCLASS
     elif dataset == 'imagenet':
