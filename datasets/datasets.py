@@ -11,6 +11,7 @@ from .custom_dataset import CustomDataset
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
 
+MNIST_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))  # one class
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 IMAGENET_SUPERCLASS = list(range(30))  # one class
@@ -254,6 +255,8 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
 def get_superclass_list(dataset):
     if dataset == 'cifar10':
         return CIFAR10_SUPERCLASS
+    elif dataset == 'mnist':
+        return MNIST_SUPERCLASS 
     elif dataset == 'fmnist':
         return FashionMNIST_SUPERCLASS    
     elif dataset == 'cifar100':
