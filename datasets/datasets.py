@@ -6,6 +6,7 @@ from torch.utils.data.dataset import Subset
 from torchvision import datasets, transforms
 
 from utils.utils import set_random_seed
+from .custom_dataset import CustomDataset
 
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
@@ -139,11 +140,21 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         train_set = datasets.CIFAR10(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.CIFAR10(DATA_PATH, train=False, download=download, transform=test_transform)
 
+    elif dataset == 'mnist':
+        image_size = (28, 28, 1)
+        n_classes = 10
+        train_set = datasets.MNIST(DATA_PATH, train=True, download=download, transform=train_transform)
+        test_set = datasets.MNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+        train_set = CustomDataset(train_set.data, train_set.targets, train_transform)
+        test_set = CustomDataset(test_set.data, test_set.targets, test_transform)
+
     elif dataset == 'fmnist':
-        image_size = (28, 28, 3)
+        image_size = (28, 28, 1)
         n_classes = 10
         train_set = datasets.FashionMNIST(DATA_PATH, train=True, download=download, transform=train_transform)
         test_set = datasets.FashionMNIST(DATA_PATH, train=False, download=download, transform=test_transform)
+        train_set = CustomDataset(train_set.data, train_set.targets, train_transform)
+        test_set = CustomDataset(test_set.data, test_set.targets, test_transform)
 
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
