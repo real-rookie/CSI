@@ -49,8 +49,12 @@ if P.one_class_idx is not None:
     P.n_superclasses = len(cls_list)
 
     full_test_set = deepcopy(test_set)  # test set of full classes
-    train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx])
-    test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+    if isinstance(P.one_class_idx, int):
+        train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx])
+        test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
+    elif isinstance(P.one_class_idx, list):
+        train_set = get_subclass_dataset(train_set, classes=P.one_class_idx)
+        test_set = get_subclass_dataset(test_set, classes=P.one_class_idx)
 
 kwargs = {'pin_memory': False, 'num_workers': 4}
 
@@ -66,7 +70,11 @@ else:
 if P.ood_dataset is None:
     if P.one_class_idx is not None:
         P.ood_dataset = list(range(P.n_superclasses))
-        P.ood_dataset.pop(P.one_class_idx)
+        if isinstance(P.one_class_idx, int):
+            P.ood_dataset.pop(P.one_class_idx)
+        elif isinstance(P.one_class_idx, list):
+            for i in P.one_class_idx:
+                P.ood_dataset.pop(i)
     elif P.dataset == 'cifar10':
         P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
     elif P.dataset == 'imagenet':
