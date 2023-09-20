@@ -11,6 +11,8 @@ def setup(mode, P):
 
     if P.one_class_idx is not None:
         fname += f'_one_class_{P.one_class_idx}'
+    if P.ood_dataset is not None:
+        fname += "_set_to_set"
 
     if P.suffix is not None:
         fname += f'_{P.suffix}'
