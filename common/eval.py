@@ -54,7 +54,7 @@ if P.ood_dataset is None:
             P.ood_dataset.pop(P.one_class_idx)
         elif isinstance(P.one_class_idx, list):
             for i in P.one_class_idx:
-                P.ood_dataset.pop(i)
+                P.ood_dataset.pop(0)
     elif P.dataset == 'cifar10':
         P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
     elif P.dataset == 'imagenet':
