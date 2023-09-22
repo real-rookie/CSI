@@ -48,13 +48,13 @@ train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kw
 test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
 
 if P.ood_dataset is None:
+    # FIXME 
     if P.one_class_idx is not None:
         P.ood_dataset = list(range(P.n_superclasses))
         if isinstance(P.one_class_idx, int):
             P.ood_dataset.pop(P.one_class_idx)
-        elif isinstance(P.one_class_idx, list):
-            for i in P.one_class_idx:
-                P.ood_dataset.pop(0)
+        for i in P.one_class_idx:
+            P.ood_dataset.remove(i)
     elif P.dataset == 'cifar10':
         P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
     elif P.dataset == 'imagenet':
