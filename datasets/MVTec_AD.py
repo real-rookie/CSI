@@ -68,9 +68,6 @@ class MVTec_AD(Dataset):
             image = read_image(f"{self.img_dir}/{folder}/{cls}/{cls}_{idx - mapping[cls-1]}.png")
         else:
             image = read_image(f"{self.img_dir}/{folder}/{cls}/{cls}_{idx}.png")
-        if image.shape[0] == 1:
-            # some images have only 1 channel
-            image = image.expand(3, -1, -1)
         image = T.Resize([self.resize, self.resize])(image)
         image = T.ToPILImage()(image)
         if self.transform:
