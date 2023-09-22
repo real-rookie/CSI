@@ -5,7 +5,7 @@ class CustomDataset(Dataset):
     def __init__(self, data: torch.Tensor, targets: torch.Tensor, transform: callable):
         super().__init__()
         assert data.size(0) == targets.size(0), "Size mismatch between tensors"
-        self.data = data.unsqueeze(3).expand(-1, -1, -1, 3).numpy()
+        self.data = data.unsqueeze(1).expand(-1, 3, -1, -1).numpy() # N C H W
         self.targets = targets.tolist()
         self.transform = transform
 
