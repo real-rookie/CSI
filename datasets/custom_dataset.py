@@ -10,7 +10,7 @@ class CustomDataset(Dataset):
         self.transform = transform
 
     def __getitem__(self, index):
-        return self.transform(T.ToPILImage(self.data[index])), self.targets[index]
+        return self.transform(T.ToPILImage()(self.data[index])), self.targets[index]
 
     def __len__(self):
         return len(self.targets)
