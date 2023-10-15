@@ -39,6 +39,7 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         check = time.time()
 
         ### SimCLR loss ###
+        # if dataset is NOT imagenet
         if P.dataset != 'imagenet':
             batch_size = images.size(0)
             images = images.to(device)
