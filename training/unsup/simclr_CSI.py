@@ -48,6 +48,9 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
             images1, images2 = images[0].to(device), images[1].to(device)
         labels = labels.to(device)
 
+        # Assuming batch_size == 1 for easier illustration
+        # if shift_trans is rotation, then k == 4
+        # and images1 and images2 are stacks of four images of different rotations times
         images1 = torch.cat([P.shift_trans(images1, k) for k in range(P.K_shift)])
         images2 = torch.cat([P.shift_trans(images2, k) for k in range(P.K_shift)])
         shift_labels = torch.cat([torch.ones_like(labels) * k for k in range(P.K_shift)], 0)  # B -> 4B

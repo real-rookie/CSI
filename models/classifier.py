@@ -8,6 +8,7 @@ import models.transform_layers as TL
 def get_simclr_augmentation(P, image_size):
 
     # parameter for resizecrop
+    # resize scale is sampled from [resize_factor, 1.0]
     resize_scale = (P.resize_factor, 1.0) # resize scaling factor
     if P.resize_fix: # if resize_fix is True, use same scale
         resize_scale = (P.resize_factor, P.resize_factor)

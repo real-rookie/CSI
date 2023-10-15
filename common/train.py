@@ -37,6 +37,10 @@ else:
     P.multi_gpu = False
 
 ### only use one ood_layer while training
+# layer for OOD scores
+# choices=['penultimate', 'simclr', 'shift']
+# default=['simclr', 'shift'], nargs="+"
+# using simclr
 P.ood_layer = P.ood_layer[0]
 
 ### Initialize dataset ###
@@ -44,18 +48,22 @@ train_set, test_set, image_size, n_classes = get_dataset(P, dataset=P.dataset)
 P.image_size = image_size
 P.n_classes = n_classes
 
+# SIMO and inter_set
 if P.one_class_idx is not None:
     cls_list = get_superclass_list(P.dataset)
     P.n_superclasses = len(cls_list)
 
     full_test_set = deepcopy(test_set)  # test set of full classes
+    # the following if blocks are the same?
     if isinstance(P.one_class_idx, int):
         train_set = get_subclass_dataset(train_set, classes=cls_list[P.one_class_idx])
         test_set = get_subclass_dataset(test_set, classes=cls_list[P.one_class_idx])
     elif isinstance(P.one_class_idx, list):
         train_set = get_subclass_dataset(train_set, classes=P.one_class_idx)
         test_set = get_subclass_dataset(test_set, classes=P.one_class_idx)
+    # train_set and test_set only contain images whose labels are normal
 
+# TODO maybe pin_memory should be true for MVTec-AD
 kwargs = {'pin_memory': False, 'num_workers': 4}
 
 if P.multi_gpu:
@@ -66,13 +74,17 @@ if P.multi_gpu:
 else:
     train_loader = DataLoader(train_set, shuffle=True, batch_size=P.batch_size, **kwargs)
     test_loader = DataLoader(test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+    # SIMO, inter_set: these two loaders only contain normal images
+    # set_to_set: they contain all images, since they are all normal
 
+# SIMO and inter_set
 if P.ood_dataset is None:
     # FIXME 
     if P.one_class_idx is not None:
         P.ood_dataset = list(range(P.n_superclasses))
         for i in P.one_class_idx:
             P.ood_dataset.remove(i)
+            # P.ood_dataset contains labels of novel images
     elif P.dataset == 'cifar10':
         P.ood_dataset = ['svhn', 'lsun_resize', 'imagenet_resize', 'lsun_fix', 'imagenet_fix', 'cifar100', 'interp']
     elif P.dataset == 'imagenet':
@@ -80,6 +92,8 @@ if P.ood_dataset is None:
 
 ood_test_loader = dict()
 for ood in P.ood_dataset:
+# SIMO, inter_set: P.ood_dataset contains novel labels
+# set_to_set: P.ood_dataset contains the names of novel datasets
     if ood == 'interp':
         ood_test_loader[ood] = None  # dummy loader
         continue
@@ -95,14 +109,21 @@ for ood in P.ood_dataset:
         ood_test_loader[ood] = DataLoader(ood_test_set, sampler=ood_sampler, batch_size=P.test_batch_size, **kwargs)
     else:
         ood_test_loader[ood] = DataLoader(ood_test_set, shuffle=False, batch_size=P.test_batch_size, **kwargs)
+        # ood_test_loader contains a dict of test images
+        # ood is a label for SIMO and inter_set, or a name of a novel dataset
 
 ### Initialize model ###
 
+# helpful augmentation: color_jitter, color_gray, resize_crop
 simclr_aug = C.get_simclr_augmentation(P, image_size=P.image_size).to(device)
+# what is K_shift?
+# shifting augmentation: rotation, perm, identity!?
 P.shift_trans, P.K_shift = C.get_shift_module(P, eval=True)
 P.shift_trans = P.shift_trans.to(device)
 
+# ResNet
 model = C.get_classifier(P.model, n_classes=P.n_classes).to(device)
+# what is shift_classifier? why is it nn.Linear(ResNet.last_dim, K_shift)?
 model = C.get_shift_classifer(model, P.K_shift).to(device)
 
 criterion = nn.CrossEntropyLoss().to(device)
@@ -128,6 +149,8 @@ else:
 
 from training.scheduler import GradualWarmupScheduler
 scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=10.0, total_epoch=P.warmup, after_scheduler=scheduler)
+
+# TODO, sgd? lr_scheduler? GradualWarmupsScheduler
 
 if P.resume_path is not None:
     resume = True

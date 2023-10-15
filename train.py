@@ -18,6 +18,7 @@ logger.log(model)
 if P.multi_gpu:
     linear = model.module.linear
 else:
+    # TODO what is model.linear
     linear = model.linear
 linear_optim = torch.optim.Adam(linear.parameters(), lr=1e-3, betas=(.9, .999), weight_decay=P.weight_decay)
 
