@@ -43,29 +43,34 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         if P.dataset != 'imagenet':
             batch_size = images.size(0)
             images = images.to(device)
+            # the horizontal flip is required by SimClr
             images1, images2 = hflip(images.repeat(2, 1, 1, 1)).chunk(2)  # hflip
         else:
             batch_size = images[0].size(0)
             images1, images2 = images[0].to(device), images[1].to(device)
         labels = labels.to(device)
 
-        # Assuming batch_size == 1 for easier illustration
-        # if shift_trans is rotation, then k == 4
-        # and images1 and images2 are stacks of four images of different rotations times
         images1 = torch.cat([P.shift_trans(images1, k) for k in range(P.K_shift)])
         images2 = torch.cat([P.shift_trans(images2, k) for k in range(P.K_shift)])
         shift_labels = torch.cat([torch.ones_like(labels) * k for k in range(P.K_shift)], 0)  # B -> 4B
         shift_labels = shift_labels.repeat(2)
 
         images_pair = torch.cat([images1, images2], dim=0)  # 8B
-        images_pair = simclr_aug(images_pair)  # transform
-
+        images_pair = simclr_aug(images_pair)  
+        # transform: color_jitter, color_gray, resize_crop 
+        
+        # TODO what is going on here?
         _, outputs_aux = model(images_pair, simclr=True, penultimate=True, shift=True)
+
+        # outputs_aux['penultimate'] is of (length, -1)
+        # outputs_aux['simclr'] is of (length, 128(simclr_dim))
+        # outputs_aux['shift'] is of (length, 2), why 2?
 
         simclr = normalize(outputs_aux['simclr'])  # normalize
         sim_matrix = get_similarity_matrix(simclr, multi_gpu=P.multi_gpu)
+        # Loss cls-SI
         loss_sim = NT_xent(sim_matrix, temperature=0.5) * P.sim_lambda
-
+        # Loss con-SI
         loss_shift = criterion(outputs_aux['shift'], shift_labels)
 
         ### total loss ###
@@ -83,6 +88,7 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         ### Post-processing stuffs ###
         simclr_norm = outputs_aux['simclr'].norm(dim=1).mean()
 
+        # what is going on here?
         penul_1 = outputs_aux['penultimate'][:batch_size]
         penul_2 = outputs_aux['penultimate'][P.K_shift * batch_size: (P.K_shift + 1) * batch_size]
         outputs_aux['penultimate'] = torch.cat([penul_1, penul_2])  # only use original rotation
@@ -90,7 +96,8 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         ### Linear evaluation ###
         outputs_linear_eval = linear(outputs_aux['penultimate'].detach())
         loss_linear = criterion(outputs_linear_eval, labels.repeat(2))
-
+        
+        # what is linear?
         linear_optim.zero_grad()
         loss_linear.backward()
         linear_optim.step()

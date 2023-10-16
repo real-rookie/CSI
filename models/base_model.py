@@ -23,20 +23,25 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         _return_aux = False
 
         features = self.penultimate(inputs)
+        # (length, -1)
 
         output = self.linear(features)
+        # (length, number_classes)
 
         if penultimate:
             _return_aux = True
             _aux['penultimate'] = features
+            # (length, -1)
 
         if simclr:
             _return_aux = True
             _aux['simclr'] = self.simclr_layer(features)
-
+            # (length, 128(simclr_dim))
+            
         if shift:
             _return_aux = True
             _aux['shift'] = self.shift_cls_layer(features)
+            # (length, 2)
 
         if joint:
             _return_aux = True
