@@ -41,20 +41,24 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         ### SimCLR loss ###
         # if dataset is NOT imagenet
         if P.dataset != 'imagenet':
+            # assume batch_size == 4
             batch_size = images.size(0)
             images = images.to(device)
             # the horizontal flip is required by SimClr
             images1, images2 = hflip(images.repeat(2, 1, 1, 1)).chunk(2)  # hflip
+            # each has four images
         else:
             batch_size = images[0].size(0)
             images1, images2 = images[0].to(device), images[1].to(device)
         labels = labels.to(device)
 
+        # each has 16 images
         images1 = torch.cat([P.shift_trans(images1, k) for k in range(P.K_shift)])
         images2 = torch.cat([P.shift_trans(images2, k) for k in range(P.K_shift)])
         shift_labels = torch.cat([torch.ones_like(labels) * k for k in range(P.K_shift)], 0)  # B -> 4B
         shift_labels = shift_labels.repeat(2)
-
+        
+        # 32 images
         images_pair = torch.cat([images1, images2], dim=0)  # 8B
         images_pair = simclr_aug(images_pair)  
         # transform: color_jitter, color_gray, resize_crop 
@@ -89,12 +93,16 @@ def train(P, epoch, model, criterion, optimizer, scheduler, loader, logger=None,
         simclr_norm = outputs_aux['simclr'].norm(dim=1).mean()
 
         # what is going on here?
+        # 0-3
         penul_1 = outputs_aux['penultimate'][:batch_size]
+        # 16-19
+        # both are unrotated images
         penul_2 = outputs_aux['penultimate'][P.K_shift * batch_size: (P.K_shift + 1) * batch_size]
         outputs_aux['penultimate'] = torch.cat([penul_1, penul_2])  # only use original rotation
 
         ### Linear evaluation ###
         outputs_linear_eval = linear(outputs_aux['penultimate'].detach())
+        # the linear layer is judging whether A and flipped A are A
         loss_linear = criterion(outputs_linear_eval, labels.repeat(2))
         
         # what is linear?

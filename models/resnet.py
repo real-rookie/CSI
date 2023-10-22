@@ -43,6 +43,7 @@ class BasicBlock(nn.Module):
         return out
 
 
+# this class is not used
 class PreActBlock(nn.Module):
     '''Pre-activation version of the BasicBlock.'''
     expansion = 1
@@ -126,6 +127,7 @@ class PreActBottleneck(nn.Module):
         return out
 
 
+# of interest
 class ResNet(BaseModel):
     def __init__(self, block, num_blocks, num_classes=10):
         last_dim = 512 * block.expansion
