@@ -34,7 +34,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         features = self.penultimate(inputs)
         print("features = self.penultimate(inputs)")
         print(features.shape)
-        # (length, -1)
+        # (length, 512)
 
         output = self.linear(features)
         print("output = self.linear(features)")
@@ -45,7 +45,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
             _return_aux = True
             _aux['penultimate'] = features
             print(_aux['penultimate'].shape)
-            # (length, -1)
+            # (length, 512)
 
         if simclr:
             _return_aux = True
@@ -57,7 +57,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
             _return_aux = True
             _aux['shift'] = self.shift_cls_layer(features)
             print(_aux['shift'].shape)
-            # (length, 2)
+            # (length, 4) it is 4 because of K
 
         if joint:
             _return_aux = True
