@@ -155,22 +155,22 @@ class ResNet(BaseModel):
         return nn.Sequential(*layers)
 
     def penultimate(self, x, all_features=False):
-        out_list = []
+        #out_list = []
 
         out = self.normalize(x)
         out = self.conv1(out)
         out = self.bn1(out)
         out = F.relu(out)
-        out_list.append(out)
+        #out_list.append(out)
 
         out = self.layer1(out)
-        out_list.append(out)
+        #out_list.append(out)
         out = self.layer2(out)
-        out_list.append(out)
+        #out_list.append(out)
         out = self.layer3(out)
-        out_list.append(out)
+        #out_list.append(out)
         out = self.layer4(out)
-        out_list.append(out)
+        #out_list.append(out)
 
         out = F.avg_pool2d(out, 4)
         out = out.view(out.size(0), -1)

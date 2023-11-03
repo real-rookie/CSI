@@ -9,6 +9,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         print(num_classes)
         print(simclr_dim)
         super(BaseModel, self).__init__()
+        self.last_dim = last_dim
         self.linear = nn.Linear(last_dim, num_classes)
         print("self.linear = nn.Linear(last_dim, num_classes)")
         print(last_dim)
@@ -34,6 +35,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         features = self.penultimate(inputs)
         print("features = self.penultimate(inputs)")
         print(features.shape)
+        features = nn.Linear(features.shape[1], self.last_dim)(features)
         # (length, 512)
 
         output = self.linear(features)

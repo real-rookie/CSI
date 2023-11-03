@@ -122,6 +122,11 @@ P.shift_trans, P.K_shift = C.get_shift_module(P, eval=True)
 P.shift_trans = P.shift_trans.to(device)
 
 # ResNet
+if P.one_class_idx is not None:
+    if isinstance(P.one_class_idx, list):
+        P.n_classes = len(P.one_class_idx)
+    else:
+        P.n_classes = 1 # possibly performs badly
 model = C.get_classifier(P.model, n_classes=P.n_classes).to(device)
 # what is shift_classifier? why is it nn.Linear(ResNet.last_dim, K_shift)?
 model = C.get_shift_classifer(model, P.K_shift).to(device)
