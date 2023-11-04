@@ -160,7 +160,7 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         test_set = CustomDataset(test_set.data, test_set.targets, test_transform)
     
     elif dataset == 'mvtec_ad':
-        image_size = (128, 128, 3)
+        image_size = (224, 224, 3)
         n_classes = 15
         train_set = MVTec_AD("data/MVTec-AD", True, image_size[0], train_transform)
         test_set = MVTec_AD("data/MVTec-AD", False, image_size[0], test_transform)
