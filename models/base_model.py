@@ -35,6 +35,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         features = self.penultimate(inputs)
         print("features = self.penultimate(inputs)")
         print(features.shape)
+        # TO CUDA
         features = nn.Linear(features.shape[1], self.last_dim)(features)
         # (length, 512)
 

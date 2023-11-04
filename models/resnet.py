@@ -162,7 +162,8 @@ class ResNet(BaseModel):
         out = self.bn1(out)
         out = F.relu(out)
         #out_list.append(out)
-
+        print("before")
+        print(out.shape)
         out = self.layer1(out)
         #out_list.append(out)
         out = self.layer2(out)
@@ -171,7 +172,8 @@ class ResNet(BaseModel):
         #out_list.append(out)
         out = self.layer4(out)
         #out_list.append(out)
-
+        print("after")
+        print(out.shape)
         out = F.avg_pool2d(out, 4)
         out = out.view(out.size(0), -1)
 
