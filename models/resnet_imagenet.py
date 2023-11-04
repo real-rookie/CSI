@@ -185,29 +185,29 @@ class ResNet(BaseModel):
 
     def penultimate(self, x, all_features=False):
         # See note [TorchScript super()]
-        out_list = []
+        #out_list = []
 
         x = self.normalize(x)
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
-        out_list.append(x)
+        #out_list.append(x)
 
         x = self.layer1(x)
-        out_list.append(x)
+        #out_list.append(x)
         x = self.layer2(x)
-        out_list.append(x)
+        #out_list.append(x)
         x = self.layer3(x)
-        out_list.append(x)
+        #out_list.append(x)
         x = self.layer4(x)
-        out_list.append(x)
+        #out_list.append(x)
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
 
         if all_features:
-            return x, out_list
+            return x#, out_list
         else:
             return x
 
