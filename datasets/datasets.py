@@ -16,6 +16,7 @@ MNIST_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))  # one class
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 MVTEC_AD_SUPERCLASS = list(range(15))
+INaturalist_SUPERCLASS = list(range(142))
 IMAGENET_SUPERCLASS = list(range(30))  # one class
 
 CIFAR100_SUPERCLASS = [
@@ -164,6 +165,12 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         n_classes = 15
         train_set = MVTec_AD("data/MVTec-AD", True, image_size[0], train_transform)
         test_set = MVTec_AD("data/MVTec-AD", False, image_size[0], test_transform)
+    
+    elif dataset == 'INaturalist':
+        image_size = (500, 500, 3)
+        n_classes = 142
+        train_set = datasets.INaturalist(DATA_PATH, "2021_train", target_type="Animalia", transform=train_transform, download=True)
+        test_set = datasets.INaturalist(DATA_PATH, "2021_valid", target_type="Animalia", transform=test_transform, download=True)
 
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
@@ -269,6 +276,8 @@ def get_superclass_list(dataset):
         return FashionMNIST_SUPERCLASS
     elif dataset == 'mvtec_ad':
         return MVTEC_AD_SUPERCLASS    
+    elif dataset == 'INaturalist':
+        return INaturalist_SUPERCLASS    
     elif dataset == 'cifar100':
         return CIFAR100_SUPERCLASS
     elif dataset == 'imagenet':
