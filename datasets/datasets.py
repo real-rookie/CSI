@@ -169,8 +169,8 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
     elif dataset == 'INaturalist':
         image_size = (500, 500, 3)
         n_classes = 142
-        train_set = datasets.INaturalist(DATA_PATH, "2021_train", target_type="Animalia", transform=train_transform, download=True)
-        test_set = datasets.INaturalist(DATA_PATH, "2021_valid", target_type="Animalia", transform=test_transform, download=True)
+        train_set = datasets.INaturalist(DATA_PATH, "2021_train", target_type="kingdom", transform=train_transform, download=True)
+        test_set = datasets.INaturalist(DATA_PATH, "2021_valid", target_type="kingdom", transform=test_transform, download=True)
 
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
