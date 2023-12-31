@@ -75,12 +75,12 @@ def get_transform(image_size=None):
     # Hence, we only define the identity transformation here
     if image_size:  # use pre-specified image size
         train_transform = transforms.Compose([
-            transforms.Resize((image_size[0], image_size[1])),
+            transforms.Resize((image_size, image_size)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
         ])
         test_transform = transforms.Compose([
-            transforms.Resize((image_size[0], image_size[1])),
+            transforms.Resize((image_size, image_size)),
             transforms.ToTensor(),
         ])
     else:  # use default image size
