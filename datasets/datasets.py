@@ -8,6 +8,7 @@ from torchvision import datasets, transforms
 from utils.utils import set_random_seed
 from .custom_dataset import CustomDataset
 from .MVTec_AD import MVTec_AD
+from .mvtec_loco import mvtec_loco
 
 DATA_PATH = './data/'
 IMAGENET_PATH = './data/ImageNet'
@@ -16,6 +17,7 @@ MNIST_SUPERCLASS = list(range(10))
 FashionMNIST_SUPERCLASS = list(range(10))  # one class
 CIFAR10_SUPERCLASS = list(range(10))  # one class
 MVTEC_AD_SUPERCLASS = list(range(15))
+MVTEC_LOCO_SUPERCLASS = list(range(5))
 IMAGENET_SUPERCLASS = list(range(30))  # one class
 
 CIFAR100_SUPERCLASS = [
@@ -165,6 +167,12 @@ def get_dataset(P, dataset, test_only=False, image_size=None, download=False, ev
         train_set = MVTec_AD("data/MVTec-AD", True, image_size[0], train_transform)
         test_set = MVTec_AD("data/MVTec-AD", False, image_size[0], test_transform)
 
+    elif dataset == 'mvtec_loco':
+        image_size = (500, 500, 3)
+        n_classes = 5
+        train_set = mvtec_loco("data/mvtec_loco", True, image_size[0], train_transform)
+        test_set = mvtec_loco("data/mvtec_loco", False, image_size[0], test_transform)
+
     elif dataset == 'cifar100':
         image_size = (32, 32, 3)
         n_classes = 100
@@ -269,6 +277,8 @@ def get_superclass_list(dataset):
         return FashionMNIST_SUPERCLASS
     elif dataset == 'mvtec_ad':
         return MVTEC_AD_SUPERCLASS    
+    elif dataset == 'mvtec_loco':
+        return MVTEC_LOCO_SUPERCLASS  
     elif dataset == 'cifar100':
         return CIFAR100_SUPERCLASS
     elif dataset == 'imagenet':
